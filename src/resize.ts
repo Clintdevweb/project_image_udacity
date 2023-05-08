@@ -1,4 +1,6 @@
-import sharp from "sharp"
+import sharp from "sharp";
+import checkFileExist from "./checkFileExist";
+import { unlinkSync } from "fs";
 
 const resizeImage = async (
   filename: string,
@@ -6,6 +8,10 @@ const resizeImage = async (
   height: number
 ): Promise<string> => {
   try {
+    const isExist = await checkFileExist(`src/assets/thumb/${filename}.jpg`)
+    if(isExist) {
+      unlinkSync(`src/assets/thumb/${filename}.jpg`)
+    }
     const result = await sharp(`src/assets/full/${filename}.jpg`)
       .resize({ width: width, height: height, fit: "cover" })
       .toFile(`src/assets/thumb/${filename}.jpg`)
@@ -21,7 +27,7 @@ const resizeImage = async (
     } else {
       return Promise.reject("Success resize image")
     }
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
     throw error
   }
