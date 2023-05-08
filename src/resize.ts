@@ -1,20 +1,14 @@
-import sharp from "sharp";
-import checkFileExist from "./checkFileExist";
-import { unlinkSync } from "fs";
+import sharp from 'sharp'
 
 const resizeImage = async (
   filename: string,
   width: number,
   height: number
-): Promise<string> => {
+): Promise<boolean> => {
   try {
-    const isExist = await checkFileExist(`src/assets/thumb/${filename}.jpg`)
-    if(isExist) {
-      unlinkSync(`src/assets/thumb/${filename}.jpg`)
-    }
     const result = await sharp(`src/assets/full/${filename}.jpg`)
-      .resize({ width: width, height: height, fit: "cover" })
-      .toFile(`src/assets/thumb/${filename}.jpg`)
+      .resize({ width: width, height: height, fit: 'cover' })
+      .toFile(`src/assets/thumb/${filename}-${width}-${height}.jpg`)
       .then(() => {
         return Promise.resolve(true)
       })
@@ -23,13 +17,13 @@ const resizeImage = async (
       })
 
     if (result) {
-      return Promise.resolve("Success resize image")
+      return Promise.resolve(true)
     } else {
-      return Promise.reject("Success resize image")
+      return Promise.reject(false)
     }
   } catch (error) {
     console.log(error)
-    throw error
+    throw 'File name can be wrong. Please check again!'
   }
 }
 

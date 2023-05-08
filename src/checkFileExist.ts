@@ -1,11 +1,13 @@
-import { existsSync } from "fs"
+import { accessSync, constants } from 'fs'
 
 const checkFileExist = async (filename: string): Promise<boolean> => {
-   if(existsSync(filename)) {
+  try {
+    accessSync(filename, constants.R_OK)
     return Promise.resolve(true)
-   }else {
+  } catch (error) {
+    console.log(error)
     return Promise.resolve(false)
-   }
+  }
 }
 
 export default checkFileExist

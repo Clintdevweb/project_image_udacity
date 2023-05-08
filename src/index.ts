@@ -1,43 +1,49 @@
-import express from "express"
-import resizeImage from "./resize"
+import express from 'express'
+import resizeImage from './resize'
+import checkFileExist from './checkFileExist'
 
 const app = express()
 const port = 3000
 
-app.get("/", (req, res) => {
-  res.send("Welcome to my project image") 
+app.get('/', (req, res) => {
+  res.send('Welcome to my project image')
 })
 
-app.get("/api/images", async (req, res) => {
+app.get('/api/images', async (req, res) => {
   try {
-    let filename = ""
+    let filename = ''
     let width = 200
-    let height= 200
+    let height = 200
 
-    if (req.query.width) {
-      width = Number(req.query.width)
+    if (req.query.width && !isNaN(+req.query.width)) {
+      width = Number(req.query.width) || 200
     } else {
-      width = 200
+      throw 'Width must be number and not empty'
+      // res.send('Width must be number and not empty')
     }
 
-    if (req.query.height) {
-      height = Number(req.query.height)
+    if (req.query.height && !isNaN(+req.query.height)) {
+      height = Number(req.query.height) || 200
     } else {
-      width = 200
+      // res.send('Height must be number and not empty')
+      throw 'Height must be number and not empty'
     }
 
     if (req.query.filename) {
       filename = req.query.filename.toString()
-      const result = await resizeImage(filename, width, height)
-      if (result) {
-        res.sendFile(`${__dirname}/assets/thumb/${filename}.jpg`)
+      const isExist = await checkFileExist(filename)
+      if (!isExist) {
+        await resizeImage(filename, width, height)
       }
+      res.sendFile(
+        `${__dirname}/assets/thumb/${filename}-${width}-${height}.jpg`
+      )
     } else {
-      res.send("No file name no provide, Please check again!")
+      throw 'No file name no provide, Please check again!'
     }
   } catch (error) {
     console.log(error)
-    res.send("File name can be wrong, Plese check again!")
+    res.send(error)
   }
 })
 
