@@ -5,7 +5,7 @@ const app = express()
 const port = 3000
 
 app.get("/", (req, res) => {
-  res.send("Welcome to my project image")
+  res.send("Welcome to my project image") 
 })
 
 app.get("/api/images", async (req, res) => {
